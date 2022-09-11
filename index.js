@@ -18,12 +18,27 @@ app.listen(port, () => {
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.zjrcntk.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+async function run() {
+    try {
+        await client.connect()
+        const pageCollection = client.db('pages').collection('item')
+        console.log('database connected');
 
+        app.post('/products', async (req, res) => {
+            const product = req.body;
+            if (!product.name || !product.price) {
+                return res.send({ success: false, error: 'Please provide valid information' })
+            }
+            const result = await pageCollection.insertOne(product)
+            res.send(result)
+        })
 
+    }
+    catch (error) {
+        console.log(error);
+    }
+    finally {
 
-client.connect(err => {
-    const collection = client.db("test").collection("devices");
-    // perform actions on the collection object
-    client.close();
-    console.log('db connected');
-});
+    }
+}
+run().catch(console.dir)
