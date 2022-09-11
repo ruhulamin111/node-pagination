@@ -30,8 +30,18 @@ async function run() {
                 return res.send({ success: false, error: 'Please provide valid information' })
             }
             const result = await pageCollection.insertOne(product)
-            res.send(result)
+            res.send({ success: true, message: `Successfully inserted ${product.name}` })
         })
+
+        app.get('/products', async (req, res) => {
+            // if (!req.body.length) {
+            //     return res.send({ success: false, error: 'No data avaiable' })
+            // }
+            const result = await pageCollection.find({}).toArray()
+            res.send(result)
+            // res.send({ success: true, error: 'Data is available' })
+        })
+
 
     }
     catch (error) {
