@@ -22,7 +22,6 @@ async function run() {
     try {
         await client.connect()
         const pageCollection = client.db('pages').collection('item')
-        console.log('database connected');
 
         app.post('/products', async (req, res) => {
             const product = req.body;
@@ -34,12 +33,11 @@ async function run() {
         })
 
         app.get('/products', async (req, res) => {
-            // if (!req.body.length) {
-            //     return res.send({ success: false, error: 'No data avaiable' })
-            // }
-            const result = await pageCollection.find({}).toArray()
-            res.send(result)
-            // res.send({ success: true, error: 'Data is available' })
+            const page = Number(req.query.page)
+            const size = Number(req.query.size)
+            const result = await pageCollection.find({}).skip(page * size).limit(size).toArray()
+            const count = await pageCollection.estimatedDocumentCount()
+            res.send({ result, count })
         })
 
 
